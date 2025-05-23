@@ -46,19 +46,31 @@ if (process.env.NODE_ENV === 'production') {
   const clientBuildPaths = [
     path.join(__dirname, '../client/build'),    // Regular path
     path.join(__dirname, './client/build'),     // Docker path
-    path.join(__dirname, 'client/build')        // Alternative path
+    path.join(__dirname, 'client/build'),       // Alternative path
+    '/app/client/build'                         // Docker absolute path
   ];
+  
+  console.log('Looking for client build paths:');
   
   // Find the first valid path
   let clientBuildPath;
   for (const testPath of clientBuildPaths) {
     try {
+      console.log(`- Checking path: ${testPath}`);
       if (fs.existsSync(testPath)) {
         clientBuildPath = testPath;
+        console.log(`✓ Found valid path: ${testPath}`);
+        
+        // Log directory contents
+        const files = fs.readdirSync(testPath);
+        console.log(`Files in ${testPath}:`, files);
+        
         break;
+      } else {
+        console.log(`✗ Path does not exist: ${testPath}`);
       }
     } catch (err) {
-      // Path doesn't exist, try next one
+      // Path doesn't exist, try next one      console.log(`✗ Error checking path ${testPath}:`, err.message);
     }
   }
   
@@ -349,6 +361,15 @@ io.on('connection', (socket) => {
 
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
+
+// Run diagnostics in production
+if (process.env.NODE_ENV === 'production') {
+  try {
+    require('./debugServer');
+  } catch (error) {
+    console.error('Error running diagnostics:', error);
+  }
+}
 
 connectDB()
   .then(() => {

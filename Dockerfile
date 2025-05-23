@@ -32,6 +32,10 @@ RUN mkdir -p /app/client/build
 # Copy client build to server's static folder
 COPY --from=client-build /app/client/build /app/client/build
 
+# Copy the port check script
+COPY port_check.sh /app/port_check.sh
+RUN chmod +x /app/port_check.sh
+
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=10000
@@ -39,5 +43,6 @@ ENV PORT=10000
 # Expose server port
 EXPOSE 10000
 
-# Start the server
-CMD ["npm", "start"]
+# Start with port check and then run the server
+ENTRYPOINT ["/app/port_check.sh"]
+CMD ["node", "index.js"]
