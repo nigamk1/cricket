@@ -58,6 +58,14 @@ Common issues:
 - Build failures: Check that all dependencies are properly defined in package.json
 - Socket connection issues: Ensure CORS is properly configured
 
+### MongoDB Connection Notes
+
+The project uses Mongoose version 8.x which has deprecated the following connection options:
+- `useNewUrlParser` - No longer needed since MongoDB Driver 4.0.0
+- `useUnifiedTopology` - No longer needed since MongoDB Driver 4.0.0
+
+These options have been removed from the connection code to prevent warnings.
+
 ## Local Development vs Production
 
 When developing locally, use:
