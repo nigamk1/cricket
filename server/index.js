@@ -41,11 +41,18 @@ app.use(errorHandler);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  // Set correct path for production build
+  const clientBuildPath = path.join(__dirname, '../client/build');
   
+  // Serve static files
+  app.use(express.static(clientBuildPath));
+  
+  // For any other route, serve the index.html
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.resolve(clientBuildPath, 'index.html'));
   });
+  
+  console.log('Serving static files from:', clientBuildPath);
 }
 
 // Active players and rooms

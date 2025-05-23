@@ -16,20 +16,13 @@ services:
         sync: false # You'll set this in Render dashboard
       - key: JWT_SECRET
         sync: false # You'll set this in Render dashboard
-    healthCheckPath: /api/health
-
-  # Frontend static site
+    healthCheckPath: /api/health  # Frontend static site
   - type: web
     name: cricket-game-client
-    env: static
+    env: docker
     region: oregon
     plan: free
-    buildCommand: cd client && npm install && npm run react-build
-    staticPublishPath: ./client/dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    dockerfilePath: ./Dockerfile.web
     envVars:
       - key: REACT_APP_API_URL
         value: https://cricket-game-api.onrender.com
