@@ -3,7 +3,12 @@ const mongoose = require('mongoose');
 // Connect to MongoDB
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://nigkumar:nigamkumar12345@cluster0.krodbsg.mongodb.net/helpmateai?retryWrites=true&w=majority&appName=nigkumar', {
+    if (!process.env.MONGO_URI) {
+      console.error('MONGO_URI environment variable is not set');
+      process.exit(1);
+    }
+    
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });

@@ -1,0 +1,37 @@
+services:
+  # Backend API service
+  - type: web
+    name: cricket-game-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false # You'll set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false # You'll set this in Render dashboard
+    healthCheckPath: /api/health
+
+  # Frontend static site
+  - type: web
+    name: cricket-game-client
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: cd client && npm install && npm run react-build
+    staticPublishPath: ./client/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://cricket-game-api.onrender.com
+      - key: REACT_APP_SOCKET_URL
+        value: https://cricket-game-api.onrender.com

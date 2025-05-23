@@ -31,6 +31,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/games', require('./routes/gameRoutes'));
 
+// Health check endpoint for Render
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Error handler
 app.use(errorHandler);
 
