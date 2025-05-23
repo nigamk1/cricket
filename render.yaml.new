@@ -1,0 +1,21 @@
+services:
+  # Combined backend and frontend service
+  - type: web
+    name: cricket-game
+    env: docker
+    region: oregon
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false # You'll set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false # You'll set this in Render dashboard
+      - key: REACT_APP_API_URL
+        value: https://cricket-98nx.onrender.com
+      - key: REACT_APP_SOCKET_URL
+        value: https://cricket-98nx.onrender.com

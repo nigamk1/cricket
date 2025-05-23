@@ -5,6 +5,7 @@ const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 // Import routes and services
 const roomService = require('./services/roomService');
@@ -41,18 +42,39 @@ app.use(errorHandler);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  // Set correct path for production build
-  const clientBuildPath = path.join(__dirname, '../client/build');
+  // Define possible client build paths
+  const clientBuildPaths = [
+    path.join(__dirname, '../client/build'),    // Regular path
+    path.join(__dirname, './client/build'),     // Docker path
+    path.join(__dirname, 'client/build')        // Alternative path
+  ];
   
-  // Serve static files
-  app.use(express.static(clientBuildPath));
+  // Find the first valid path
+  let clientBuildPath;
+  for (const testPath of clientBuildPaths) {
+    try {
+      if (fs.existsSync(testPath)) {
+        clientBuildPath = testPath;
+        break;
+      }
+    } catch (err) {
+      // Path doesn't exist, try next one
+    }
+  }
   
-  // For any other route, serve the index.html
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(clientBuildPath, 'index.html'));
-  });
-  
-  console.log('Serving static files from:', clientBuildPath);
+  if (clientBuildPath) {
+    console.log(`Serving static files from: ${clientBuildPath}`);
+    
+    // Serve static files
+    app.use(express.static(clientBuildPath));
+    
+    // For any other route, serve the index.html
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
+    });
+  } else {
+    console.warn('Client build directory not found!');
+  }
 }
 
 // Active players and rooms
